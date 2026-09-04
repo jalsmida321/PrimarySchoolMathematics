@@ -38,9 +38,11 @@ const error = ref("");
 const success = ref("");
 const router = useRouter();
 const appStore = useAppStore();
+const configuredAiApiBase = String(import.meta.env.VITE_AI_API_BASE_URL || "").trim();
 const aiApiBase = (
-  import.meta.env.VITE_AI_API_BASE_URL ||
-  (import.meta.env.PROD ? "https://api.teacherdeck.org" : "")
+  /^https?:\/\//i.test(configuredAiApiBase)
+    ? configuredAiApiBase
+    : (import.meta.env.PROD ? "https://api.teacherdeck.org" : "")
 ).replace(/\/$/, "");
 
 onMounted(() => {
