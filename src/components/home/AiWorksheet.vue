@@ -38,6 +38,10 @@ const error = ref("");
 const success = ref("");
 const router = useRouter();
 const appStore = useAppStore();
+const aiApiBase = (
+  import.meta.env.VITE_AI_API_BASE_URL ||
+  (import.meta.env.PROD ? "https://api.teacherdeck.org" : "")
+).replace(/\/$/, "");
 
 onMounted(() => {
   apiKey.value = sessionStorage.getItem("pinniq-api-key") || "";
@@ -49,7 +53,7 @@ const loadModels = async () => {
   modelsLoading.value = true;
   error.value = "";
   try {
-    const response = await fetch("/api/ai/models", {
+    const response = await fetch(`${aiApiBase}/api/ai/models`, {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ apiKey: apiKey.value.trim(), baseUrl: baseUrl.value.trim() }),
     });
@@ -80,7 +84,7 @@ const generate = async () => {
   sessionStorage.setItem("pinniq-base-url", baseUrl.value.trim());
   sessionStorage.setItem("pinniq-model", modelId.value);
   try {
-    const response = await fetch("/api/ai/worksheet", {
+    const response = await fetch(`${aiApiBase}/api/ai/worksheet`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ prompt: prompt.value.trim(), apiKey: apiKey.value.trim(), baseUrl: baseUrl.value.trim(), modelId: modelId.value }),
