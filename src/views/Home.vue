@@ -151,7 +151,7 @@ const selectedConfiguration = (configuration) => {
 const buttonLoading = ref(false)
 const appStore = useAppStore()
 const router = useRouter()
-const generate = () => {
+const generate = async () => {
   // 生成试卷数量不能过多
   const numberOfFormulas = paperList.value.reduce((prev, cur) => {
     prev += parseInt(cur.numberOfFormulas)
@@ -164,7 +164,7 @@ const generate = () => {
   }
 
   const papers = createFormulasGenerator(toRaw(unref(formData)), toRaw(unref(paperList)))
-  appStore.navigateToPrint(router, formData.value.fileNameGeneratedRule == fileNameGeneratedRuleEnum.baseOnTitleAndIndex.key ? formData.value.paperTitle : "", papers)
+  await appStore.navigateToPrint(router, formData.value.fileNameGeneratedRule == fileNameGeneratedRuleEnum.baseOnTitleAndIndex.key ? formData.value.paperTitle : "", papers)
   paperList.value = []
 }
 </script>

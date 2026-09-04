@@ -98,9 +98,9 @@ const generate = async () => {
       throw new Error(`服务返回了非 JSON 响应（HTTP ${response.status}）：${responseText.slice(0, 200)}`);
     }
     if (!response.ok) throw new Error(result?.error || `AI 出题失败（HTTP ${response.status}）`);
-    if (!result?.plan || !Array.isArray(result.papers)) throw new Error("服务返回的数据不完整");
-    appStore.navigateToPrint(router, result.plan.paperTitle, result.papers);
-    success.value = "已生成并打开试卷预览";
+    if (!result?.plan || !Array.isArray(result.papers) || !result.papers.length) throw new Error("服务没有返回可预览的试卷");
+    await appStore.navigateToPrint(router, result.plan.paperTitle, result.papers);
+    if (router.currentRoute.value.path !== "/print") throw new Error("试卷已生成，但未能打开预览页");
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : String(cause);
   } finally {

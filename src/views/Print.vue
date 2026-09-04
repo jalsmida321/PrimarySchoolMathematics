@@ -1,6 +1,10 @@
 <template>
   <div :class="{ 'preview': !isPrinting }">
     <div class="A4">
+      <div v-if="!sheets.length" class="empty-preview">
+        <p>没有找到试卷预览数据，请返回后重新生成。</p>
+        <ElButton type="primary" @click="goBack">返回出题页</ElButton>
+      </div>
       <div v-for="sheet in sheets" class="sheet padding-10mm" :class="{ 'sheet-shadow': !isPrinting }">
         <div class="mt-12 mb-12">
           <h1>{{ sheet.paperTitle }}</h1>
@@ -37,6 +41,7 @@ const isPrinting = ref(false)
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
+appStore.restorePrintPreview()
 
 const sheets = computed(() => {
   return appStore.printPreviewPapers.map(p => {
@@ -107,6 +112,18 @@ const print = () => {
 
 .A4 {
   text-align: center;
+}
+
+.empty-preview {
+  width: 210mm;
+  min-height: 120mm;
+  padding: 40mm 10mm;
+  box-sizing: border-box;
+  background: white;
+}
+
+.empty-preview p {
+  margin: 0 0 20px;
 }
 
 .sheet {
