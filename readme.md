@@ -1,96 +1,105 @@
+# Primary School Mathematics AI
 
-#  小学数学口算题 | Primary School Mathematics 2.1
+小学口算出题 MVP：基于原项目的 Vue 界面，使用可验证、可复现、有上限的数学题生成器，并通过 pi SDK 接入 Pinniq AI。
 
-![输入图片说明](https://img.shields.io/badge/Vue-3.2.41-blue)
-![输入图片说明](https://img.shields.io/badge/license-Apache--2.0-green)
-![输入图片说明](https://img.shields.io/badge/Github--PrimarySchoolMathematics-green?logo=github)
-
-## 背景 | Background
-孩子上小学一年级了，加减乘除的口算就要开始练习了，估计老师肯定会让家长出题，所以提前准备一下，利用Python开发了一套自动生成小学生口算题的小应用。
-为了让辛苦的程序员老爹解放抄题的双手，本程序让你拥有更多的时间去写代码而不用去手写几道口算题而劳神伤脑。所以有或没有娃子的程序员老爹们一起来继续优化个开源小程序的？有什么点子，发现什么BUG，欢迎提出issue。
-
-仅以此软件，献给那些热爱编程的程序员老爹们！
-
-[小学数学口算题在线使用地址1](https://suiyan.cc/demo/psm/)
-
-[小学数学口算题在线使用地址2](https://tsukasa521.github.io/PrimarySchoolMathematics)
-
-如果访问慢可以使用这个地址:
-[地址](https://kkplusplus.gitee.io/primaryschoolmathematics)
-
-## 功能列表 | Features
-- 可以设置各算数项和结果的取值范围及多步算数（最多三步）符号的选择。
-- 可以生成求结果、求算数项、带括号的算式，除法可以生成带有余数的口算题。
-- 可以简单设置试卷标题，副标题。设置生成的口算题试卷个数。
-- 用户可最多保存10份配置在浏览器端，方便给熊孩子重复生成口算题。🔥
-- 除口算解题外还提供生成竖式题，让熊孩子不能逃脱被试卷支配的恐惧。🔥
-- 除了自动生成试题外，还支持手动添加题目，可以手工添加特殊题目，还可以将之前的错题进行重复练习。🔥
-- 提供仅用日期来作为生成的文件名，让家长们蹭公司打印机时更隐蔽。🔥
-- `New` 试卷打印完全由前端生成。🔥
-
-## 如何使用 | How to use
-
-### 例子 | Samples
-
-例1：生成10以内的加减法
-![](images/Sample01.png)
-
-例2：2位数乘以2位数的竖式题
-![](images/Sample02.png)
-
-例3：2位数除以1位数并且有余数
-![](images/Sample03.png)
-
-例4：不带括号的混合运算
-![](images/Sample04.png)
-
-例5：带括号的混合运算
-![](images/Sample05.png)
-
-## 本地运行 | Getting Started
-安装依赖
+## 本地运行
 
 ```sh
-  yarn # 推荐Yarn安装
+npm install --include=dev --ignore-scripts
+npm run test:mvp
+npm run agent       # 另一个终端运行 npm run dev
 ```
 
-启动
+打开 `http://127.0.0.1:1101`。
+
+## AI 配置
+
+默认 OpenAI 兼容地址为 `https://api.pinniq.org/v1`。前端输入从 Pinniq 后台生成的 API Key。Key 仅保存到当前浏览器 sessionStorage，服务端只在当前请求的内存中使用，不写日志、不落盘。
+
+可通过环境变量指定默认模型：
 
 ```sh
-  yarn dev
+PINNIQ_DEFAULT_MODEL=模型ID npm run agent
 ```
 
-启动成功后访问 `http://127.0.0.1:1101` 即可。
+## MVP 可靠性改进
 
-打包
+- 不再使用 `eval()` 计算题目
+- 支持 seed，便于复现同一份试卷
+- 试卷内题目去重
+- 配置和除零等错误提前校验
+- 生成尝试次数有上限，不满足条件时返回可读错误
+- 每道题同时保留显示文本、答案、运算步骤、操作数和运算符
+- 使用 Fisher-Yates 洗牌
+- `tests/psm.test.mjs` 覆盖确定性、去重、不可能条件和除零
+
+## 部署到 ks.teacherdeck.org
+
+项目包含两个部署模板：
+
+- `nginx-ks.teacherdeck.org.conf.example`
+- `primary-school-math-ai.service.example`
+
+推荐使用现有 Ubuntu/Nginx 服务器。先在域名 DNS 控制台添加：
+
+```text
+类型：A
+主机记录：ks
+记录值：49.51.200.107
+TTL：默认
+```
+
+在本地构建：
 
 ```sh
-  yarn build
-
-  yarn build:github # 为了部署github pages
+npm install --include=dev --ignore-scripts
+npm run test:mvp
+npm run build
 ```
 
-> 打包完成后,为了github page部署,前端静态资源会复制一份到`docs`文件夹
+把项目上传到服务器 `/var/www/primary-school-math-ai`，然后在服务器执行：
 
-## 技术栈 | Tech Stack
-- Vue 3
-- pinia
-- element-plus
+```sh
+cd /var/www/primary-school-math-ai
+npm install --omit=dev --ignore-scripts
+sudo cp primary-school-math-ai.service.example /etc/systemd/system/primary-school-math-ai.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now primary-school-math-ai
+sudo systemctl status primary-school-math-ai
+```
 
-## 贡献者 | Contributors
-感谢曾经贡献过代码的同学，再次谢谢你们！
-- [@J_sky](https://github.com/bosichong)
-- [@KK++](https://github.com/tsukasa521)
-- [@ruancheng77](https://github.com/ruancheng77)
-- [@andywu1998](https://github.com/andywu1998)
+注意：服务端依赖 `@earendil-works/pi-ai` 和 `@earendil-works/pi-coding-agent`，不能只上传 `dist`。
 
-后续还想添加的功能有：小数的口算题，整十百千的口算，分数口算题（这个完全没有思路）。
+配置 Nginx：
 
-## 捐赠
+```sh
+sudo cp nginx-ks.teacherdeck.org.conf.example /etc/nginx/sites-available/ks.teacherdeck.org
+sudo ln -s /etc/nginx/sites-available/ks.teacherdeck.org /etc/nginx/sites-enabled/ks.teacherdeck.org
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
-开发和维护花费了我很多业余时间，如果你觉得项目帮助到您，请认真考虑请作者喝一杯咖啡好吗？😋
+确认 HTTP 可访问后申请 HTTPS：
 
-![](images/wx.png) ![](images/zfb.png)
+```sh
+sudo certbot --nginx -d ks.teacherdeck.org
+```
 
+检查：
 
+```sh
+curl https://ks.teacherdeck.org/healthz
+sudo journalctl -u primary-school-math-ai -f
+```
 
+上线后建议在 systemd 配置中设置：
+
+```text
+ALLOWED_PROVIDER_HOSTS=api.pinniq.org
+```
+
+如果必须允许自定义中转站，填写逗号分隔的域名白名单，不要把任意 URL 直接暴露给公网用户。
+
+## 许可证
+
+原项目为 Apache-2.0。衍生版本保留原许可证和归属信息。

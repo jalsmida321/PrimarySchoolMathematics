@@ -2,6 +2,7 @@
   <div class="page-container">
     <ElRow :gutter="20">
       <ElCol :xs="24" :sm="16" :md="16" :lg="12" :xl="8">
+        <AiWorksheet />
         <ElForm ref="refForm" :model="formData" label-position="top">
           <ElFormItem label="生成模式">
             <el-radio-group v-model="formData.generateMode">
@@ -42,7 +43,7 @@
 <script setup>
 import { ref, onMounted, unref, toRaw, getCurrentInstance, computed } from 'vue';
 import { useRouter } from "vue-router";
-import { CustomFormulas, AutoGenerateFormulas, ConfigurationList } from "@/components/home";
+import { CustomFormulas, AutoGenerateFormulas, ConfigurationList, AiWorksheet } from "@/components/home";
 import ConfigStorage from "@/utils/configStorage";
 import { fileNameGeneratedRuleEnum, httpContentTypeExtensionsMappingEnum } from '@/utils/enum';
 import { download } from "@/utils/download";

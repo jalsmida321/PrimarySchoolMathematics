@@ -9,9 +9,13 @@
     "preview:github": "vite preview --base=/PrimarySchoolMathematics/",
     "build": "vite build",
     "build:suiyan": "vite build --base=/demo/psm/",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:mvp": "node --test tests/psm.test.mjs",
+    "agent": "node server/index.mjs"
   },
   "dependencies": {
+    "@earendil-works/pi-ai": "0.84.4",
+    "@earendil-works/pi-coding-agent": "0.84.4",
     "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.1.3",
     "element-plus": "2.3.1",

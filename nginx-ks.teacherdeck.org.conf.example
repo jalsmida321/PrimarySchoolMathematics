@@ -1,0 +1,32 @@
+# Copy to /etc/nginx/sites-available/ks.teacherdeck.org
+# Replace /var/www/primary-school-math-ai/dist with the real deployment path.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ks.teacherdeck.org;
+
+    root /var/www/primary-school-math-ai/dist;
+    index index.html;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:3100;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+        client_max_body_size 128k;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location = /healthz {
+        proxy_pass http://127.0.0.1:3100/healthz;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+}

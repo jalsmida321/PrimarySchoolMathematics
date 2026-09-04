@@ -1,4 +1,4 @@
-import FormulasGenerator from "./psm";
+import FormulasGenerator from "./psm.js";
 
 /**
  * 生成试卷
@@ -7,6 +7,7 @@ import FormulasGenerator from "./psm";
  * @returns
  */
 export function createFormulasGenerator(options, paperList) {
+  const seed = options.seed || `${Date.now()}-${Math.random()}`;
   // 组装需要自动生成的题型组
   const postAutoGeneratePaperList = paperList.filter(p => !p.customFormulaList).map(p => {
 
@@ -41,23 +42,29 @@ export function createFormulasGenerator(options, paperList) {
   const papers = []
 
   for (let i = 0; i < parseInt(options.numberOfPapers); i++) {
-    const f = postAutoGeneratePaperList.reduce((pre, cur) => {
+    const generatedQuestions = postAutoGeneratePaperList.reduce((pre, cur, sectionIndex) => {
       const op = cur
-      const Gen = new FormulasGenerator(op.add, op.sub, op.mult, op.div, op.step, op.number, op.is_result, op.is_bracket, op.multistep, op.symbols)
-      pre.push(...Gen.generate())
+      const Gen = new FormulasGenerator(op.add, op.sub, op.mult, op.div, op.step, op.number, op.is_result, op.is_bracket, op.multistep, op.symbols, {
+        seed: `${seed}-paper-${i}-section-${sectionIndex}`,
+      })
+      pre.push(...Gen.generateQuestions())
       return pre
     }, [])
-
-    f.sort((pre, cur) => {
-      return Math.random() > 0.5 ? -1 : 1
-    })
+    // Fisher-Yates 洗牌，避免 sort(Math.random) 造成分布偏差；题目和答案必须一起移动。
+    for (let index = generatedQuestions.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1))
+      ;[generatedQuestions[index], generatedQuestions[swapIndex]] = [generatedQuestions[swapIndex], generatedQuestions[index]]
+    }
+    const f = generatedQuestions.map(question => question.display)
 
     papers.push({
-      paperTitle: options.paperTitle,
-      paperSubTitle: options.paperSubTitle,
+      paperTitle: options.paperTitle || '小学生口算题',
+      paperSubTitle: options.paperSubTitle || '姓名：__________ 日期：____月____日 时间：________',
       numberOfPagerColumns: parseInt(options.numberOfPagerColumns),
       solution: options.solution,
-      formulas: f
+      formulas: f,
+      // MVP 先保留现有打印字符串，同时暴露结构化题目供判题/错题分析使用。
+      questions: generatedQuestions.map((question, index) => ({ ...question, id: `q-${index + 1}` })),
     })
   }
 

@@ -1,0 +1,22 @@
+[Unit]
+Description=Primary School Mathematics AI service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/primary-school-math-ai
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3100
+Environment=PINNIQ_BASE_URL=https://api.pinniq.org/v1
+# Set this only when you want to restrict custom provider URLs.
+# Environment=ALLOWED_PROVIDER_HOSTS=api.pinniq.org
+Environment=PINNIQ_DEFAULT_MODEL=
+ExecStart=/usr/bin/node /var/www/primary-school-math-ai/server/index.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

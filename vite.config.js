@@ -9,6 +9,9 @@ const srcPath = path.resolve(__dirname, 'src')
 export default defineConfig({
     server: {
         port: 1101,
+        proxy: {
+            '/api': 'http://127.0.0.1:3100',
+        },
     },
     resolve: {
         alias: {
